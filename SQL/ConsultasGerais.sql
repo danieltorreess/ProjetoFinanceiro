@@ -8,8 +8,14 @@ FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_SCHEMA = 'STG'
   AND TABLE_NAME = 'TB_STAGE_SAIDAS_ANALITICO';
 
+-- Validando valores na Stage Saídas
 USE FinanceiroPessoal;
 GO
-USE FinanceiroPessoal
 SELECT * FROM STG.TB_STAGE_SAIDAS_ANALITICO;
+GO
+
+-- Validando valores na ODS Saídas
+USE FinanceiroPessoal;
+GO
+SELECT * FROM ODS.TB_ODS_SAIDAS_ANALITICO;
 GO
