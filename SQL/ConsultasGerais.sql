@@ -1,3 +1,4 @@
+-- Verificando tipagem da tabela
 USE FinanceiroPessoal;
 GO
 SELECT 
@@ -18,4 +19,10 @@ GO
 USE FinanceiroPessoal;
 GO
 SELECT * FROM ODS.TB_ODS_SAIDAS_ANALITICO;
+GO
+
+-- Validando valores na DIM Tempo
+USE FinanceiroPessoal;
+GO
+SELECT * FROM DIM.DIM_TEMPO;
 GO

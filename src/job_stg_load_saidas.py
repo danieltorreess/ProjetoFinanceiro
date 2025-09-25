@@ -13,7 +13,7 @@ PWD = os.getenv("DB_PASSWORD")
 DRIVER = os.getenv("DB_DRIVER")
 
 # Caminho do Excel
-excel_path = os.getenv("EXCEL PATH")
+excel_path = os.getenv("EXCEL_PATH")
 sheet_name = "SaidasAnalitico"
 
 # Criar engine SQLAlchemy
