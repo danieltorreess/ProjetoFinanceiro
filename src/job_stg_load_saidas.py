@@ -43,6 +43,9 @@ rename_map = {
 }
 df.rename(columns=rename_map, inplace=True)
 
+# 🚨 Adicione esta linha logo abaixo:
+df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+
 print("Colunas após renomear:", df.columns.tolist())
 
 # Tratar valores numéricos (remover "R$", trocar vírgula por ponto)

@@ -80,3 +80,10 @@ HOMEBREW_NO_ENV_FILTERING=1 ACCEPT_EULA=Y brew install msodbcsql18 mssql-tools18
 
 # Verificar se o Driver foi instalado
 odbcinst -q -d
+
+# Colocar o Docker em funcionamento 
+Abrir o Docker na máquina e iniciar ele...
+Abra o terminal e digite:
+docker ps 
+docker start mssql2022
+
