@@ -15,10 +15,22 @@ GO
 SELECT * FROM STG.TB_STAGE_SAIDAS_ANALITICO;
 GO
 
+-- Validando valores na Stage Entradas
+USE FinanceiroPessoal;
+GO
+SELECT * FROM STG.TB_STAGE_ENTRADAS_ANALITICO;
+GO
+
 -- Validando valores na ODS Saídas
 USE FinanceiroPessoal;
 GO
 SELECT * FROM ODS.TB_ODS_SAIDAS_ANALITICO;
+GO
+
+-- Validando valores na ODS Entradas
+USE FinanceiroPessoal;
+GO
+SELECT * FROM ODS.TB_ODS_ENTRADAS_ANALITICO;
 GO
 
 -- Validando valores na DIM Tempo
@@ -26,3 +38,4 @@ USE FinanceiroPessoal;
 GO
 SELECT * FROM DIM.DIM_TEMPO;
 GO
+
