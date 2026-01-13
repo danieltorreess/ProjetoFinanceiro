@@ -51,3 +51,38 @@ CREATE TABLE DIM.DIM_TEMPO (
 );
 GO
 
+-- ===============================
+-- DIM_BANCO
+-- ===============================
+USE FinanceiroPessoal;
+GO
+
+CREATE TABLE DIM.DIM_BANCO (
+    ID_BANCO INT IDENTITY(1,1) PRIMARY KEY,
+    NM_BANCO NVARCHAR(100) NOT NULL
+);
+GO
+
+-- ===============================
+-- DIM_TIPO_CONTA
+-- ===============================
+USE FinanceiroPessoal;
+GO
+
+CREATE TABLE DIM.DIM_TIPO_CONTA (
+    ID_TIPO_CONTA INT IDENTITY(1,1) PRIMARY KEY,
+    NM_TIPO_CONTA NVARCHAR(100) NOT NULL
+);
+GO
+
+-- ===============================
+-- DIM_PLANO_CONTA
+-- ===============================
+USE FinanceiroPessoal;
+GO
+
+CREATE TABLE DIM.DIM_PLANO_CONTA (
+    ID_PLANO_CONTA INT IDENTITY(1,1) PRIMARY KEY,
+    NM_PLANO_CONTA NVARCHAR(200) NOT NULL
+);
+GO
