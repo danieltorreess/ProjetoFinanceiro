@@ -17,5 +17,12 @@ venv/
 *.tmp
 *.bak
 
-# macOS
+# Ignorar arquivos temporários do sistema
 .DS_Store
+Thumbs.db
+
+# Ignorar o arquivo do Power BI
+*.pbix
+
+# Ignorar notebook checkpoints
+.ipynb_checkpoints/

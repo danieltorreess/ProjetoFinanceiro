@@ -21,19 +21,31 @@ git push -u origin main
 
 ProjetoFinanceiroSQL/
 │
-├── SQL/                   # Criação de schemas e tabelas em SQL
+├── SQL/                         # Scripts SQL de criação e consultas
 │   ├── CriacaoBancoSchemas.sql
-│   └── CriacaoTabelas.sql
+│   ├── CriacaoTabelas.sql
+│   └── ConsultasGerais.sql
 │
-├── src/                   # Scripts de carga Python
-│   ├── test_connection.py
+├── src/                         # Scripts de carga e integração Python
+│   ├── app.py                   # Executa todas as cargas em sequência
 │   ├── job_stg_load_saidas.py
-│   └── job_ods_load_saidas.py
+│   ├── job_ods_load_saidas.py
+│   ├── job_stg_load_entradas.py
+│   ├── job_ods_load_entradas.py
+│   ├── job_dim_tempo.py
+│   ├── job_dim_tipo_conta.py
+│   ├── job_dim_banco.py
+│   ├── job_dim_plano_conta.py
+│   └── test_connection.py
 │
-├── venv/                  # Ambiente virtual (ignorado no Git)
-├── .env                   # Configurações sensíveis (ignorado no Git)
-├── .gitignore
-└── requirements.txt
+├── venv/                        # Ambiente virtual (ignorado no Git)
+│
+├── .env                         # Variáveis de ambiente (não versionado)
+├── .env.example                 # Exemplo de configuração
+├── .gitignore                   # Regras de exclusão do Git
+├── requirements.txt             # Dependências do projeto
+├── README.md                    # Documentação do projeto
+└── MIS33301 - Gerencial Financeiro.pbix  # Dashboard Power BI (ignorado no Git)
 
 ---
 
