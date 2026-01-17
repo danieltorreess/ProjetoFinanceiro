@@ -1,5 +1,5 @@
 -- Verificando tipagem da tabela
-USE FinanceiroPessoal;
+USE DB_FINANCEIRO_DANIEL;
 GO
 SELECT 
     COLUMN_NAME, 
@@ -10,31 +10,31 @@ WHERE TABLE_SCHEMA = 'STG'
   AND TABLE_NAME = 'TB_STAGE_SAIDAS_ANALITICO';
 
 -- Validando valores na Stage Saídas
-USE FinanceiroPessoal;
+USE DB_FINANCEIRO_DANIEL;
 GO
 SELECT * FROM STG.TB_STAGE_SAIDAS_ANALITICO;
 GO
 
 -- Validando valores na Stage Entradas
-USE FinanceiroPessoal;
+USE DB_FINANCEIRO_DANIEL;
 GO
 SELECT * FROM STG.TB_STAGE_ENTRADAS_ANALITICO;
 GO
 
 -- Validando valores na ODS Saídas
-USE FinanceiroPessoal;
+USE DB_FINANCEIRO_DANIEL;
 GO
 SELECT * FROM ODS.TB_ODS_SAIDAS_ANALITICO;
 GO
 
 -- Validando valores na ODS Entradas
-USE FinanceiroPessoal;
+USE DB_FINANCEIRO_DANIEL;
 GO
 SELECT * FROM ODS.TB_ODS_ENTRADAS_ANALITICO;
 GO
 
 -- Validando valores na DIM Tempo
-USE FinanceiroPessoal;
+USE DB_FINANCEIRO_DANIEL;
 GO
 SELECT * FROM DIM.DIM_TEMPO;
 GO

@@ -2,9 +2,10 @@ import os
 import pandas as pd
 import sqlalchemy as sa
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
 # ======================================
-# 1. Carregar variáveis do .env
+# 1️⃣ Carregar variáveis do .env
 # ======================================
 load_dotenv()
 SERVER = os.getenv("DB_SERVER")
@@ -14,15 +15,16 @@ PWD = os.getenv("DB_PASSWORD")
 DRIVER = os.getenv("DB_DRIVER")
 
 # ======================================
-# 2. Criar engine SQLAlchemy
+# 2️⃣ Criar engine segura
 # ======================================
-engine = sa.create_engine(
-    f"mssql+pyodbc://{USER}:{PWD}@{SERVER}/{DB}"
-    f"?driver={DRIVER}&Encrypt=no&TrustServerCertificate=yes"
+conn_str = (
+    f"DRIVER={{{DRIVER}}};SERVER={SERVER};DATABASE={DB};"
+    f"UID={USER};PWD={PWD};Encrypt=no;TrustServerCertificate=yes;"
 )
+engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={quote_plus(conn_str)}")
 
 # ======================================
-# 3. Criar tabela DIM se não existir
+# 3️⃣ Criar tabela DIM se não existir
 # ======================================
 create_table_sql = """
 IF NOT EXISTS (
@@ -41,7 +43,7 @@ with engine.begin() as conn:
     conn.execute(sa.text(create_table_sql))
 
 # ======================================
-# 4. Buscar planos de conta distintos
+# 4️⃣ Buscar planos de conta distintos
 # ======================================
 query = """
 SELECT DISTINCT NM_PLANO_CONTA
@@ -50,12 +52,12 @@ WHERE NM_PLANO_CONTA IS NOT NULL
 UNION
 SELECT DISTINCT NM_PLANO_CONTA
 FROM ODS.TB_ODS_ENTRADAS_ANALITICO
-WHERE NM_PLANO_CONTA IS NOT NULL
+WHERE NM_PLANO_CONTA IS NOT NULL;
 """
 df = pd.read_sql(query, engine)
 
 if df.empty:
-    print("❌ Nenhum plano de conta encontrado nas ODS.")
+    print("⚠️ Nenhum plano de conta encontrado nas ODS.")
 else:
     print(f"✅ {len(df)} planos de conta distintos encontrados.")
     df = df.sort_values("NM_PLANO_CONTA").reset_index(drop=True)

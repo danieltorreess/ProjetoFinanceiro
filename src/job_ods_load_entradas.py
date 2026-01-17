@@ -2,29 +2,30 @@ import os
 import pandas as pd
 import sqlalchemy as sa
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
-# ==============================
-# 1. Carregar variáveis do .env
-# ==============================
+# ======================================
+# 1️⃣ Carregar variáveis do .env
+# ======================================
 load_dotenv()
-
 SERVER = os.getenv("DB_SERVER")
 DB = os.getenv("DB_NAME")
 USER = os.getenv("DB_USER")
 PWD = os.getenv("DB_PASSWORD")
 DRIVER = os.getenv("DB_DRIVER")
 
-# ==============================
-# 2. Criar engine SQLAlchemy
-# ==============================
-engine = sa.create_engine(
-    f"mssql+pyodbc://{USER}:{PWD}@{SERVER}/{DB}"
-    f"?driver={DRIVER}&Encrypt=no&TrustServerCertificate=yes"
+# ======================================
+# 2️⃣ Criar engine segura
+# ======================================
+conn_str = (
+    f"DRIVER={{{DRIVER}}};SERVER={SERVER};DATABASE={DB};"
+    f"UID={USER};PWD={PWD};Encrypt=no;TrustServerCertificate=yes;"
 )
+engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={quote_plus(conn_str)}")
 
-# ==============================
-# 3. Criar tabela ODS se não existir
-# ==============================
+# ======================================
+# 3️⃣ Garantir existência da tabela ODS
+# ======================================
 create_table_sql = """
 IF NOT EXISTS(
     SELECT 1 FROM sys.tables t
@@ -43,42 +44,25 @@ BEGIN
         NR_VALOR DECIMAL (18,2) NOT NULL,
         NM_SOURCE_FILE NVARCHAR(260) NULL,
         DT_LOAD DATETIME2(3) NOT NULL DEFAULT SYSDATETIME()
-    )
+    );
 END;
 """
-
 with engine.begin() as conn:
     conn.execute(sa.text(create_table_sql))
 
-# ==============================
-# 4. Ler dados da Stage
-# ==============================
+# ======================================
+# 4️⃣ Ler dados da Stage
+# ======================================
 query_stage = "SELECT * FROM STG.TB_STAGE_ENTRADAS_ANALITICO"
 df_stage = pd.read_sql(query_stage, engine)
 
 if df_stage.empty:
-    print("❌ Stage está vazia, nada para carregar.")
+    print("⚠️ Nenhum dado encontrado na Stage (STG.TB_STAGE_ENTRADAS_ANALITICO). Nada a carregar.")
 else:
-    print(f"✅ Linhas encontradas na Stage: {len(df_stage)}")
+    print(f"✅ {len(df_stage)} linhas encontradas na Stage.")
 
-    # ==============================
-    # 5. Truncar a ODS antes da carga
-    # ==============================
-    with engine.begin() as conn:
-        conn.execute(sa.text("TRUNCATE TABLE ODS.TB_ODS_ENTRADAS_ANALITICO"))
-        print("🧹 ODS truncada com sucesso.")
-
-    # ==============================
-    # 6. Remover colunas técnicas indesejadas
-    # ==============================
-    if "LOAD_DTTM" in df_stage.columns:
-        df_stage = df_stage.drop(columns=["LOAD_DTTM"])
-
-
-    # ==============================
-    # 7. Renomear colunas Stage → ODS
-    # ==============================
-    rename_map_ods = {
+    # Renomear colunas (Stage → ODS)
+    rename_map = {
         "ID_ENTRADA": "NR_ID_ENTRADA",
         "DATA_ENTRADA": "DT_ENTRADA",
         "BANCO": "NM_BANCO",
@@ -88,18 +72,14 @@ else:
         "VALOR": "NR_VALOR",
         "SOURCE_FILE": "NM_SOURCE_FILE"
     }
+    df_stage.rename(columns=rename_map, inplace=True)
 
-    df_stage = df_stage.rename(columns=rename_map_ods)
-
-    # ==============================
-    # 8. Inserir todos os registros na ODS
-    # ==============================
-    df_stage.to_sql("TB_ODS_ENTRADAS_ANALITICO", engine, schema="ODS", if_exists="append", index=False)
-    print(f"🚀 {len(df_stage)} registros inseridos na ODS com sucesso!")
-
-    # ==============================
-    # 9. Truncar a Stage após carga
-    # ==============================
+    # Carga para a ODS
     with engine.begin() as conn:
+        conn.execute(sa.text("TRUNCATE TABLE ODS.TB_ODS_ENTRADAS_ANALITICO"))
+        df_stage.to_sql("TB_ODS_ENTRADAS_ANALITICO", conn, schema="ODS", if_exists="append", index=False)
+        print(f"🚀 {len(df_stage)} registros carregados em ODS.TB_ODS_ENTRADAS_ANALITICO")
+
+        # Limpar Stage
         conn.execute(sa.text("TRUNCATE TABLE STG.TB_STAGE_ENTRADAS_ANALITICO"))
-        print("✅ Stage truncada após carga.")
+        print("🧹 Stage STG.TB_STAGE_ENTRADAS_ANALITICO truncada com sucesso.")

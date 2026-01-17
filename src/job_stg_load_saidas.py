@@ -2,32 +2,36 @@ import os
 import pandas as pd
 import sqlalchemy as sa
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
-# Carregar variáveis do .env
+# ======================================
+# 1️⃣ Carregar variáveis do .env
+# ======================================
 load_dotenv()
-
 SERVER = os.getenv("DB_SERVER")
 DB = os.getenv("DB_NAME")
 USER = os.getenv("DB_USER")
 PWD = os.getenv("DB_PASSWORD")
 DRIVER = os.getenv("DB_DRIVER")
-
-# Caminho do Excel
 excel_path = os.getenv("EXCEL_PATH")
 sheet_name = "SaidasAnalitico"
 
-# Criar engine SQLAlchemy
-engine = sa.create_engine(
-    f"mssql+pyodbc://{USER}:{PWD}@{SERVER}/{DB}"
-    f"?driver={DRIVER}&Encrypt=no&TrustServerCertificate=yes"
+# ======================================
+# 2️⃣ Criar engine segura (suporta senhas com @ e #)
+# ======================================
+conn_str = (
+    f"DRIVER={{{DRIVER}}};SERVER={SERVER};DATABASE={DB};"
+    f"UID={USER};PWD={PWD};Encrypt=no;TrustServerCertificate=yes;"
 )
+engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={quote_plus(conn_str)}")
 
-# Ler Excel
+# ======================================
+# 3️⃣ Ler Excel e padronizar colunas
+# ======================================
+print("📘 Lendo planilha:", excel_path)
 df = pd.read_excel(excel_path, sheet_name=sheet_name)
+print("Colunas originais:", df.columns.tolist())
 
-print("Colunas originais do Excel:", df.columns.tolist())
-
-# Renomear colunas (Excel → SQL)
 rename_map = {
     "Data abertura cartão": "DATA_ABERTURA_CARTAO",
     "Data fechamento": "DATA_FECHAMENTO",
@@ -39,43 +43,37 @@ rename_map = {
     "Observação": "OBSERVACAO",
     "Parcela atual": "PARCELA_ATUAL",
     "Qtd. Parcelas": "QTD_PARCELAS",
-    "Valor": "VALOR"
+    "Valor": "VALOR",
 }
 df.rename(columns=rename_map, inplace=True)
-
-# Retirando colunas sem nomes:
-df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-
+df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
 print("Colunas após renomear:", df.columns.tolist())
 
-# Tratar valores numéricos (corrigido)
+# ======================================
+# 4️⃣ Tratar valores numéricos
+# ======================================
 if "VALOR" in df.columns:
     def limpar_valor(v):
-        # Se já for número (float ou int), retorna como está
         if isinstance(v, (float, int)):
             return float(v)
-        # Caso contrário, faz limpeza de texto
         if pd.isna(v):
             return 0.0
-        v = str(v)
-        v = v.replace("R$", "").strip()
-        v = v.replace(".", "").replace(",", ".")
+        v = str(v).replace("R$", "").replace(".", "").replace(",", ".").strip()
         try:
             return float(v)
         except ValueError:
             return 0.0
-
     df["VALOR"] = df["VALOR"].apply(limpar_valor)
 
-# Adicionar coluna de origem
 df["SOURCE_FILE"] = excel_path
 
-# Conectar e carregar no banco
-with engine.begin() as conn:
-    # Limpa Stage antes de inserir
-    conn.execute(sa.text("TRUNCATE TABLE STG.TB_STAGE_SAIDAS_ANALITICO"))
-
-    # Carrega DataFrame na tabela
-    df.to_sql("TB_STAGE_SAIDAS_ANALITICO", conn, schema="STG", if_exists="append", index=False)
-
-print("Carga concluída com sucesso!")
+# ======================================
+# 5️⃣ Carga no banco
+# ======================================
+try:
+    with engine.begin() as conn:
+        conn.execute(sa.text("TRUNCATE TABLE STG.TB_STAGE_SAIDAS_ANALITICO"))
+        df.to_sql("TB_STAGE_SAIDAS_ANALITICO", conn, schema="STG", if_exists="append", index=False)
+        print(f"🚀 {len(df)} registros carregados em STG.TB_STAGE_SAIDAS_ANALITICO")
+except Exception as e:
+    print("❌ Erro ao carregar dados na Stage:", e)

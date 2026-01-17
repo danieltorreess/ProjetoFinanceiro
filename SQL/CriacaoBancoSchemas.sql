@@ -1,26 +1,17 @@
-IF DB_ID(N'FinanceiroPessoal') IS NULL
-    CREATE DATABASE FinanceiroPessoal;
+-- Cria o banco principal do projeto
+CREATE DATABASE DB_FINANCEIRO_DANIEL;
 GO
 
-USE FinanceiroPessoal;
+-- Usa o banco recém-criado
+USE DB_FINANCEIRO_DANIEL;
 GO
 
--- Stage: dados brutos que vêm do Excel
-CREATE SCHEMA stg;
+-- Cria os schemas para organizar os dados
+CREATE SCHEMA STG;
 GO
 
--- ODS: dados tratados e padronizados
-CREATE SCHEMA ods;
+CREATE SCHEMA ODS;
 GO
 
--- Dimensões (datas, categorias, contas, etc.)
-CREATE SCHEMA dim;
-GO
-
--- Fatos (transações, saldos, etc.)
-CREATE SCHEMA fact;
-GO
-
--- Views finais para consumo (Power BI, relatórios)
-CREATE SCHEMA frame;
+CREATE SCHEMA DIM;
 GO

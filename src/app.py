@@ -1,9 +1,10 @@
 import subprocess
 import sys
 import time
+from datetime import datetime
 
 # ==========================================
-# Lista das jobs em ordem de execução
+# 🚀 Pipeline de Carga Financeira - Daniel
 # ==========================================
 jobs = [
     "job_stg_load_saidas.py",
@@ -16,22 +17,44 @@ jobs = [
     "job_dim_plano_conta.py"
 ]
 
-print("\n🚀 Iniciando execução completa do pipeline de cargas...\n")
+print("\n==============================================")
+print("🚀 INICIANDO PIPELINE DE CARGA FINANCEIRA 🚀")
+print(f"🕒 Início: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+print("==============================================\n")
 
+start_pipeline = time.time()
+
+# ==========================================
+# Execução das Jobs em sequência
+# ==========================================
 for job in jobs:
-    print(f"▶️ Executando {job}...")
+    print(f"▶️ Executando: {job}")
     start_time = time.time()
-    
-    # Executa o script como subprocesso
-    result = subprocess.run([sys.executable, f"src/{job}"], capture_output=True, text=True)
-    
-    # Mostra o output da execução
+
+    result = subprocess.run(
+        [sys.executable, f"src/{job}"],
+        capture_output=True,
+        text=True
+    )
+
+    duration = round(time.time() - start_time, 2)
+
     if result.returncode == 0:
+        print(f"✅ {job} concluído com sucesso ({duration}s)\n")
         print(result.stdout)
-        print(f"✅ {job} concluído com sucesso em {round(time.time() - start_time, 2)} segundos.\n")
     else:
-        print(f"❌ Erro ao executar {job}:\n{result.stderr}")
-        print("⛔ Execução interrompida para análise.\n")
+        print(f"❌ Erro ao executar {job} ({duration}s)")
+        print("Saída de erro:")
+        print(result.stderr)
+        print("⛔ Execução interrompida. Corrija o erro antes de continuar.\n")
         sys.exit(1)
 
-print("🎯 Todas as cargas foram executadas com sucesso!\n")
+# ==========================================
+# Resumo final
+# ==========================================
+total_duration = round(time.time() - start_pipeline, 2)
+print("==============================================")
+print("🎯 TODAS AS ETAPAS EXECUTADAS COM SUCESSO!")
+print(f"🕒 Duração total: {total_duration} segundos")
+print("🏁 Pipeline finalizado com sucesso.")
+print("==============================================\n")
