@@ -99,3 +99,5 @@ Abra o terminal e digite:
 docker ps 
 docker start mssql2022
 
+# Ver o novo IP do Mac para conexão da VM - PBI e Docker (rodar no terminal do mac)
+ipconfig getifaddr en0
