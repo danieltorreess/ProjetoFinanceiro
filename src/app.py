@@ -11,6 +11,8 @@ jobs = [
     "job_ods_load_saidas.py",
     "job_stg_load_entradas.py",
     "job_ods_load_entradas.py",
+    "job_stg_load_investimento.py",
+    "job_ods_load_investimento.py",
     "job_dim_tempo.py",
     "job_dim_tipo_conta.py",
     "job_dim_banco.py",
