@@ -39,6 +39,12 @@ GO
 SELECT * FROM DIM.DIM_TEMPO;
 GO
 
+-- Validando valores na DIM Tempo
+USE DB_FINANCEIRO_DANIEL;
+GO
+SELECT * FROM DIM.DIM_PLANO_CONTA;
+GO
+
 -- Validando valores na Stage Entradas
 USE DB_FINANCEIRO_DANIEL;
 GO
