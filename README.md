@@ -69,6 +69,9 @@ source venv/bin/activate
 
 # Bibliotecas usadas
 pip install pandas openpyxl sqlalchemy pyodbc python-dotenv
+pip install --upgrade pip
+pip install requests python-dotenv
+pip install msal requests python-dotenv
 
 # Criando meu arquivo Requirements.txt
 pip freeze > requirements.txt
